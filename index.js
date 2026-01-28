@@ -30,6 +30,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'home.html'));
 });
 
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
 
 app.get('/review', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'review.html'));
