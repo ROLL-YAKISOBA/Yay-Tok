@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yay! Profile Analyzer | Cyber Edition</title>
+    <style>
+        :root {
+            --primary-color: #00f2ff;
+            --primary-glow: rgba(0, 242, 255, 0.5);
+            --secondary-color: #7000ff;
+            --alert-color: #ff0055;
+            --bg-dark: #0a0a12;
+            --card-bg: rgba(16, 16, 24, 0.9);
+            --text-main: #ffffff;
+            --text-muted: #888;
+            --border-color: rgba(0, 242, 255, 0.3);
+            --log-bg: #000000;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; 
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem 0;
+            overflow-y: scroll;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
+            width: 90%;
+            max-width: 600px;
+            animation: slideIn 0.5s ease-out;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--primary-glow);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group { margin-bottom: 1rem; }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #fff;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif;
+            letter-spacing: 2px;
+            cursor: pointer;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #fff;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        button:disabled { background: #555; cursor: not-allowed; }
+
+
+        #resultCard {
+            display: none; 
+            margin-top: 2rem;
+            border: 1px solid #444;
+            background: rgba(0,0,0,0.6);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .profile-header {
+            position: relative;
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            background-color: #333;
+        }
+
+        .profile-icon {
+            position: absolute;
+            bottom: -30px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #000;
+            background-color: #000;
+            background-size: cover;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .profile-body {
+            padding: 40px 20px 20px 20px;
+        }
+
+        .user-name { font-size: 1.4rem; font-weight: bold; color: #fff; }
+        .user-id { font-size: 0.9rem; color: var(--primary-color); font-family: 'Consolas', monospace; margin-bottom: 10px; }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            margin-right: 5px;
+            font-weight: bold;
+            border: 1px solid transparent;
+        }
+        .badge-online { border-color: #00ff9d; color: #00ff9d; background: rgba(0, 255, 157, 0.1); }
+        .badge-offline { border-color: #666; color: #aaa; }
+        .badge-vip { border-color: gold; color: gold; background: rgba(255, 215, 0, 0.1); }
+        .badge-danger { border-color: var(--alert-color); color: var(--alert-color); background: rgba(255, 0, 85, 0.1); }
+
+        .bio-box {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #ddd;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            border-left: 2px solid var(--primary-color);
+        }
+
+       
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .stat-item {
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+        .stat-val { font-size: 1.1rem; font-weight: bold; color: #fff; }
+        .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+
+        
+        .private-section {
+            margin-top: 20px;
+            border: 1px dashed var(--alert-color);
+            padding: 10px;
+            background: rgba(255, 0, 85, 0.05);
+        }
+        .private-title {
+            color: var(--alert-color);
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 5px 0;
+        }
+        .data-key { color: #aaa; }
+        .data-val { color: #fff; font-family: 'Consolas', monospace; }
+
+       
+        #logWindow {
+            margin-top: 1.5rem;
+            height: 100px;
+            background-color: var(--log-bg);
+            border: 1px solid #333;
+            border-left: 3px solid var(--primary-color);
+            padding: 10px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 11px;
+            color: #ddd;
+            border-radius: 4px;
+        }
+        .log-entry { margin-bottom: 2px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .type-error { color: var(--alert-color); }
+        .type-success { color: #00ff9d; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>PROFILE SCANNER</h2>
+
+    <div class="form-group">
+        <label>TARGET USER ID</label>
+        <input type="text" id="userId" placeholder="Input User ID (e.g. 12345)">
+    </div>
+
+    <div class="form-group">
+        <label>AUTH TOKEN</label>
+        <input type="text" id="token" placeholder="Bearer Token (Optional if public)">
+    </div>
+
+    <button id="sendBtn">EXECUTE SCAN</button>
+
+    <div id="resultCard">
+        </div>
+
+    <div id="logWindow">
+        <div class="log-entry" style="color:#ffd700;">[SYSTEM] Ready. Waiting for target input...</div>
+    </div>
+</div>
+
+<script>
+    const sendBtn = document.getElementById('sendBtn');
+    const resultCard = document.getElementById('resultCard');
+    const logWindow = document.getElementById('logWindow');
+
+ 
+    function addLog(msg, type = 'normal') {
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        if(type === 'error') div.classList.add('type-error');
+        if(type === 'success') div.classList.add('type-success');
+        div.innerText = `> ${msg}`;
+        logWindow.appendChild(div);
+        logWindow.scrollTop = logWindow.scrollHeight;
+    }
+
+   
+    function formatTime(unixTime) {
+        if (!unixTime) return 'N/A';
+        return new Date(unixTime * 1000).toLocaleString('ja-JP');
+    }
+
+  
+    sendBtn.addEventListener('click', async () => {
+        const userId = document.getElementById('userId').value;
+        const text = document.getElementById('token').value; 
+
+        if (!userId) {
+            addLog('Target User ID is missing!', 'error');
+            return;
+        }
+
+     
+        resultCard.style.display = 'none';
+        resultCard.innerHTML = '';
+        sendBtn.disabled = true;
+        sendBtn.innerText = 'SCANNING...';
+        addLog(`Initiating scan for UserID: ${userId}...`);
+
+        try {
+            const response = await fetch('/getProf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, text }) 
+            });
+
+            const data = await response.json();
+
+            if (data.result === 'success' || (data.user && data.user.id)) {
+                addLog('Data retrieval successful.', 'success');
+                renderProfile(data);
+            } else {
+                addLog('Error: ' + (data.message || 'Unknown response'), 'error');
+            }
+
+        } catch (error) {
+            console.error(error);
+            addLog('Connection Failed: ' + error.message, 'error');
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.innerText = 'EXECUTE SCAN';
+        }
+    });
+
+
+    function renderProfile(data) {
+        const user = data.user || {};
+        
+      
+        const coverImg = user.cover_image_thumbnail || user.cover_image || '';
+        const iconImg = user.profile_icon_thumbnail || user.profile_icon || '';
+        
+   
+        let badgesHtml = '';
+        if (user.online_status === 'online') {
+            badgesHtml += `<span class="badge badge-online">ONLINE</span>`;
+        } else {
+            badgesHtml += `<span class="badge badge-offline">LAST: ${formatTime(user.last_loggedin_at).split(' ')[0]}</span>`;
+        }
+        if (user.vip) badgesHtml += `<span class="badge badge-vip">VIP</span>`;
+        if (user.dangerous_user) badgesHtml += `<span class="badge badge-danger">DANGER</span>`;
+        if (user.age_verified) badgesHtml += `<span class="badge" style="border-color:#00f2ff; color:#00f2ff;">AGE VERIFIED</span>`;
+
+       
+        let html = `
+            <div class="profile-header" style="background-image: url('${coverImg}');">
+                <div class="profile-icon" style="background-image: url('${iconImg}');"></div>
+            </div>
+            <div class="profile-body">
+                <div class="user-name">${user.nickname || 'Unknown'} ${badgesHtml}</div>
+                <div class="user-id">ID: ${user.id} <span style="color:#666;">/ ${user.country_code || 'N/A'}</span></div>
+                
+                <div class="bio-box">${user.biography || '(No biography)'}</div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-val">${user.followers_count}</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">${user.followings_count}</div>
+                        <div class="stat-label">Following</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">${user.posts_count}</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">${user.groups_users_count}</div>
+                        <div class="stat-label">Groups</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">${user.reviews_count}</div>
+                        <div class="stat-label">Reviews</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">${user.created_at ? new Date(user.created_at * 1000).getFullYear() : '----'}</div>
+                        <div class="stat-label">Since</div>
+                    </div>
+                </div>
+        `;
+
+        
+        if (data.email || data.masked_email) {
+            html += `
+                <div class="private-section">
+                    <div class="private-title">⚠ INTERNAL DATA DETECTED</div>
+                    
+                    <div class="data-row">
+                        <span class="data-key">Email</span>
+                        <span class="data-val">${data.email || data.masked_email}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-key">UUID</span>
+                        <span class="data-val">${data.uuid || 'N/A'}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-key">Account Status</span>
+                        <span class="data-val" style="color:${data.banned ? 'red' : '#00ff9d'}">${data.banned ? 'BANNED' : 'ACTIVE'}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-key">Phone / Video</span>
+                        <span class="data-val">${data.phone_on ? 'ON' : 'OFF'} / ${data.video_on ? 'ON' : 'OFF'}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-key">Connected</span>
+                        <span class="data-val">
+                            ${data.google_connected ? 'G ' : ''}
+                            ${data.twitter_id ? 'X ' : ''}
+                            ${data.line_connected ? 'LINE ' : ''}
+                            ${data.apple_connected ? 'Apple ' : ''}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        html += `</div>`; 
+        
+        resultCard.innerHTML = html;
+        resultCard.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
