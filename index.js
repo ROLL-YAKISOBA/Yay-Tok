@@ -44,6 +44,9 @@ app.get('/v2/review', (req, res) => {
     res.sendFile(path.join(__dirname, 'v2', 'review.html'));
 });
 
+app.get('/v2/threads', (req, res) => {
+    res.sendFile(path.join(__dirname, 'v2', 'threads.html'));
+});
 
 
 app.post('/proxy/threads', async (req, res) => {
@@ -64,7 +67,7 @@ app.post('/proxy/threads', async (req, res) => {
             url: targetUrl,
             headers: {
                 'Content-Type': 'application/json',
-                'authorization':  `${token}`// Bearer プレフィックスが必要な場合は `${token}` と調整
+                'authorization':  `${token}`
             },
             data: {
 
