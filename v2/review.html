@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yay! Review Poster | Cyber Log Edition</title>
+    <style>
+        :root {
+            --primary-color: #00f2ff;
+            --primary-glow: rgba(0, 242, 255, 0.5);
+            --secondary-color: #7000ff;
+            --bg-dark: #0a0a12;
+            --card-bg: rgba(16, 16, 24, 0.85);
+            --text-main: #ffffff;
+            --border-color: rgba(0, 242, 255, 0.3);
+            --log-bg: #000000;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
+            width: 100%;
+            max-width: 450px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--primary-glow);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group { margin-bottom: 1rem; }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #fff;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+        }
+
+        textarea { height: 80px; resize: none; }
+
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        #logWindow {
+            margin-top: 1.5rem;
+            height: 150px; 
+            background-color: var(--log-bg);
+            border: 1px solid #333;
+            border-left: 3px solid var(--primary-color);
+            padding: 10px;
+            overflow-y: auto; 
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            color: #ddd;
+            border-radius: 4px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+       
+        .log-entry {
+            margin-bottom: 4px;
+            line-height: 1.4;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 2px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .log-time { color: #666; margin-right: 8px; }
+        .log-prefix { font-weight: bold; margin-right: 5px; }
+        
+       
+        .type-info { color: #00f2ff; }   
+        .type-success { color: #00ff9d; } 
+        .type-error { color: #ff0055; }  
+        .type-system { color: #ffd700; }  
+
+       
+        #logWindow::-webkit-scrollbar { width: 8px; }
+        #logWindow::-webkit-scrollbar-track { background: #000; }
+        #logWindow::-webkit-scrollbar-thumb { 
+            background: #333; 
+            border-radius: 4px; 
+            border: 1px solid #000;
+        }
+        #logWindow::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif;
+            letter-spacing: 2px;
+            cursor: pointer;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #fff;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+      
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: #aaa; transition: .4s; }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(20px); background-color: #000; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>YAY! REVIEWER</h2>
+
+    <div class="form-group">
+        <label>TARGET UID</label>
+        <input type="text" id="userId" placeholder="USER ID">
+    </div>
+
+    <div class="form-group">
+        <label>AUTH TOKEN</label>
+        <input type="password" id="token" placeholder="Bearer token...">
+    </div>
+
+    <div class="form-group">
+        <label>MESSAGE</label>
+        <textarea id="comment" placeholder="Input payload..."></textarea>
+    </div>
+
+    <div class="toggle-container">
+        <span onclick="document.getElementById('randomToggle').click()" style="cursor:pointer">Add Random Hash</span>
+        <label class="switch">
+            <input type="checkbox" id="randomToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <button id="sendBtn">EXECUTE</button>
+
+    <div id="logWindow">
+        <div class="log-entry">
+            <span class="log-time">[SYSTEM]</span>
+            <span class="type-system">Ready. Waiting for input...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sendBtn = document.getElementById('sendBtn');
+    const logWindow = document.getElementById('logWindow');
+    const randomToggle = document.getElementById('randomToggle');
+    
+  
+    function addLog(message, type = 'info') {
+        const now = new Date();
+        
+        const timeStr = now.toLocaleTimeString('ja-JP', { hour12: false });
+        
+        
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        
+        let prefix = '[INFO]';
+        let typeClass = 'type-info';
+
+        if (type === 'success') { prefix = '[OK]'; typeClass = 'type-success'; }
+        if (type === 'error') { prefix = '[ERR]'; typeClass = 'type-error'; }
+        if (type === 'system') { prefix = '[SYS]'; typeClass = 'type-system'; }
+
+        entry.innerHTML = `
+            <span class="log-time">[${timeStr}]</span>
+            <span class="log-prefix ${typeClass}">${prefix}</span>
+            <span style="color: #eee;">${message}</span>
+        `;
+
+        //
+        logWindow.appendChild(entry);
+
+        // 
+        logWindow.scrollTop = logWindow.scrollHeight;
+    }
+
+    function generateRandomString(length) {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return result;
+    }
+
+    sendBtn.addEventListener('click', async () => {
+        const userId = document.getElementById('userId').value;
+        const token = document.getElementById('token').value;
+        let text = document.getElementById('comment').value;
+
+        if (!userId || !token || !text) {
+            addLog('Missing fields detected.', 'error');
+            return;
+        }
+
+        if (randomToggle.checked) {
+            const rnd = generateRandomString(12);
+            text += `\n|${rnd}|`; 
+            addLog(`Random hash generated: ${rnd}`, 'system');
+        }
+
+        sendBtn.disabled = true;
+        sendBtn.innerText = 'PROCESSING...';
+        addLog(`Initializing request to Target: ${userId}...`, 'info');
+
+        try {
+            
+            const response = await fetch("/proxy/review", { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, token, text })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                addLog('Payload delivered successfully.', 'success');
+                addLog(`Response: ${JSON.stringify(result).substring(0, 50)}...`, 'success');
+            } else {
+                addLog(`Server responded with error: ${result.message || 'Unknown'}`, 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            addLog('Connection refused or Network Error.', 'error');
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.innerText = 'EXECUTE';
+        }
+    });
+</script>
+
+</body>
+</html>
