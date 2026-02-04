@@ -27,7 +27,7 @@ app.get('/threads', (req, res) => {
 
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'home.html'));
+    res.sendFile(path.join(__dirname, 'v2', 'home.html'));
 });
 
 app.get('/profile', (req, res) => {
