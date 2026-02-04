@@ -34,6 +34,10 @@ app.get('/profile', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 
+app.get('/v2/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'v2', 'profile.html'));
+});
+
 
 app.get('/review', (req, res) => {
     res.sendFile(path.join(__dirname, 'v2', 'review.html'));
