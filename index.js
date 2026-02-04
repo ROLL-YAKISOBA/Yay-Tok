@@ -22,7 +22,7 @@ app.use(cors());
 
 
 app.get('/threads', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'threads.html'));
+    res.sendFile(path.join(__dirname, 'v2', 'threads.html'));
 });
 
 
@@ -36,16 +36,16 @@ app.get('/profile', (req, res) => {
 
 
 app.get('/review', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'review.html'));
+    res.sendFile(path.join(__dirname, 'v2', 'review.html'));
 });
 
 
 app.get('/v2/review', (req, res) => {
-    res.sendFile(path.join(__dirname, 'v2', 'review.html'));
-});
+    res.sendFile(path.join(__dirname, 'public', 'review.html'));
+});ubli
 
 app.get('/v2/threads', (req, res) => {
-    res.sendFile(path.join(__dirname, 'v2', 'threads.html'));
+    res.sendFile(path.join(__dirname, 'public', 'threads.html'));
 });
 
 
